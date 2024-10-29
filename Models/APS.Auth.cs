@@ -14,13 +14,13 @@ public partial class APS
     public async Task<Tokens> GenerateTokens(string code)
     {
         var authenticationClient = new AuthenticationClient(_sdkManager);
-        var internalAuth = await authenticationClient.GetThreeLeggedTokenAsync(_clientId, _clientSecret, code, _callbackUri);
-        var publicAuth = await authenticationClient.GetRefreshTokenAsync(_clientId, _clientSecret, internalAuth.RefreshToken, PublicTokenScopes);
+        var internalAuth = await authenticationClient.GetThreeLeggedTokenAsync(_clientId, code, _callbackUri, clientSecret: _clientSecret);
+        var publicAuth = await authenticationClient.RefreshTokenAsync(internalAuth.RefreshToken, _clientId, clientSecret: _clientSecret, scopes: PublicTokenScopes);
         return new Tokens
         {
             PublicToken = publicAuth.AccessToken,
             InternalToken = internalAuth.AccessToken,
-            RefreshToken = publicAuth._RefreshToken,
+            RefreshToken = publicAuth.RefreshToken,
             ExpiresAt = DateTime.Now.ToUniversalTime().AddSeconds((double)internalAuth.ExpiresIn)
         };
     }
@@ -28,13 +28,13 @@ public partial class APS
     public async Task<Tokens> RefreshTokens(Tokens tokens)
     {
         var authenticationClient = new AuthenticationClient(_sdkManager);
-        var internalAuth = await authenticationClient.GetRefreshTokenAsync(_clientId, _clientSecret, tokens.RefreshToken, InternalTokenScopes);
-        var publicAuth = await authenticationClient.GetRefreshTokenAsync(_clientId, _clientSecret, internalAuth._RefreshToken, PublicTokenScopes);
+        var internalAuth = await authenticationClient.RefreshTokenAsync(tokens.RefreshToken, _clientId, clientSecret: _clientSecret, scopes: InternalTokenScopes);
+        var publicAuth = await authenticationClient.RefreshTokenAsync(internalAuth.RefreshToken, _clientId, clientSecret: _clientSecret, scopes: PublicTokenScopes);
         return new Tokens
         {
             PublicToken = publicAuth.AccessToken,
             InternalToken = internalAuth.AccessToken,
-            RefreshToken = publicAuth._RefreshToken,
+            RefreshToken = publicAuth.RefreshToken,
             ExpiresAt = DateTime.Now.ToUniversalTime().AddSeconds((double)internalAuth.ExpiresIn)
         };
     }
