@@ -1,5 +1,4 @@
 using System;
-using Autodesk.SDKManager;
 using Autodesk.Authentication.Model;
 using System.Collections.Generic;
 
@@ -13,7 +12,6 @@ public class Tokens
 
 public partial class APS
 {
-    private readonly SDKManager _sdkManager;
     private readonly string _clientId;
     private readonly string _clientSecret;
     private readonly string _callbackUri;
@@ -22,7 +20,6 @@ public partial class APS
 
     public APS(string clientId, string clientSecret, string callbackUri)
     {
-        _sdkManager = SdkManagerBuilder.Create().Build();
         _clientId = clientId;
         _clientSecret = clientSecret;
         _callbackUri = callbackUri;
